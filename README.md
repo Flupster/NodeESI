@@ -2,6 +2,11 @@
 
 This project is an axios wrapper for ESI using the Pandemic Legion DB Structure
 
+### Install
+
+Make sure you have a pubkey into PL gitlab and configure ssh ~/.ssh/config with the port to 1420  
+then run: ```npm i --save git+ssh://git@git.pandemic-legion.pl:Floppy/node-esi.git```
+
 #### Getting Started
 
 Most of the docs from Axios are relevant as this just attaches some custom interceptors from the [official axios project](https://github.com/axios/axios)
@@ -11,7 +16,7 @@ Most of the docs from Axios are relevant as this just attaches some custom inter
 
 Axios is promised based, so you can either use `.then()` or `await` but for examples I'll be using await
 
-```JS
+```javascript
 const { Esi, Token, KnexBind } = require('NodeESI')
 
 //You need to bind a knex instance to NodeESI in order to talk with a DB
