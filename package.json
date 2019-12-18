@@ -1,0 +1,17 @@
+{
+  "name": "node-esi",
+  "version": "0.0.1",
+  "description": "Node ESI Client with Auth",
+  "url": "https://git.pandemic-legion.pl/Floppy/node-esi",
+  "main": "src/index.js",
+  "scripts": {},
+  "author": "Floppy",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.1",
+    "dotenv": "^8.2.0",
+    "https": "^1.0.0",
+    "knex": "^0.20.4",
+    "objection": "^2.0.6"
+  }
+}
