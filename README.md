@@ -22,7 +22,7 @@ Most of the docs from Axios are relevant as this just attaches some custom inter
 Axios is promised based, so you can either use `.then()` or `await` but for examples I'll be using await
 
 ```javascript
-const { Esi, Token, KnexBind } = require('NodeESI')
+const { Esi, Token, KnexBind } = require('node-esi')
 
 //You need to bind a knex instance to NodeESI in order to talk with a DB
 //check https://github.com/knex/knex for more info
