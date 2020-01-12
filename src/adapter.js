@@ -51,7 +51,7 @@ class Cache {
   }
 
   async cacheResponse(request) {
-    const expires = Math.ceil((+new Date(request.headers.expires) - +new Date()) / 1000);
+    const expires = +new Date(request.headers.expires) - +new Date(request.headers.date);
     const data = JSON.stringify({
       status: request.status,
       statusText: request.statusText,
@@ -60,12 +60,6 @@ class Cache {
       url: request.url
     });
 
-    //edge case where request expires in same second (CCP issue)
-    if (expires <= 0) {
-      console.log("expires is", expires);
-      return;
-    }
-
-    return await redis.setex(this.hash, expires, data);
+    return await redis.setex(this.hash, expires / 1000 + 1, data);
   }
 }
