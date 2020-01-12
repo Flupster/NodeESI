@@ -7,7 +7,7 @@ This project is an axios wrapper for ESI using the Pandemic Legion DB Structure
 Make sure you have a pubkey into PL gitlab and configure ssh ~/.ssh/config with the port to 1420  
 then run: ```npm i --save git+ssh://git@git.pandemic-legion.pl:Floppy/node-esi.git```
 
-NodeESI also uses redis a caching layer, you will need redis-server installed before you can use NodeESI
+NodeESI also uses redis a caching layer, you will need redis-server installed before you can use NodeESI  
 You can install redis-server by running: ```sudo apt install redis-server```
 
 There is no way to change redis connection settings right now but will be implemented in the future.
