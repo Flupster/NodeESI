@@ -1,12 +1,14 @@
 const Token = require("./Token");
 const axios = require("axios");
+const adapter = require("./adapter");
 const https = require("https");
 const httpsAgent = new https.Agent({ keepAlive: true });
 
 const instance = axios.create({
   baseURL: "https://esi.evetech.net/",
   timeout: 10000,
-  httpsAgent
+  httpsAgent,
+  adapter
 });
 
 instance.interceptors.request.use(
