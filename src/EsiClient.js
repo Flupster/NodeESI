@@ -13,6 +13,10 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   async config => {
+    if (!config.url.startsWith('/')) {
+      config.url = "/" + config.url
+    }
+
     config.url = (config.version || "latest") + config.url;
 
     if (config.token instanceof Token) {
