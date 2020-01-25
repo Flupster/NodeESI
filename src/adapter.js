@@ -11,6 +11,7 @@ module.exports = async config => {
 
   if (cache.exists) {
     cache.response.cached = true;
+    cache.response.config = config
     return cache.response;
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "node-esi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node ESI Client with Auth",
   "url": "https://git.pandemic-legion.pl/Floppy/node-esi",
   "main": "src/index.js",
@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.1",
+    "axios-concurrency": "^1.0.3",
     "dotenv": "^8.2.0",
     "https": "^1.0.0",
     "ioredis": "^4.14.1",

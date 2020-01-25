@@ -1,8 +1,8 @@
-const Token = require("./Token");
 const axios = require("axios");
-const adapter = require("./adapter");
+const interceptors = require("./interceptors")
 const https = require("https");
 const httpsAgent = new https.Agent({ keepAlive: true });
+const adapter = process.env.DISABLE_ESI_CACHE === 'true' ? axios.default.adapter : require("./adapter")
 
 const instance = axios.create({
   baseURL: "https://esi.evetech.net/",
@@ -12,43 +12,13 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(
-  async config => {
-    if (!config.url.startsWith('/')) {
-      config.url = "/" + config.url
-    }
-
-    config.url = (config.version || "latest") + config.url;
-
-    if (config.token instanceof Token) {
-      if (config.token.isExpired()) await config.token.refresh();
-
-      config.headers = {
-        Authorization: "Bearer " + config.token.access_token
-      };
-    }
-
-    return config;
-  },
-  error => Promise.reject(error)
+  interceptors.request,
+  interceptors.requestError
 );
 
 instance.interceptors.response.use(
-  response => response,
-  error => {
-    if (!error.response) {
-      return Promise.reject(error);
-    } else {
-      return Promise.reject({
-        status: error.response.status,
-        message: error.response.data.error,
-        url: error.config.url,
-        ratelimit: {
-          remain: parseInt(error.response.headers["x-esi-error-limit-remain"]),
-          reset: parseInt(error.response.headers["x-esi-error-limit-reset"])
-        }
-      });
-    }
-  }
+  interceptors.response,
+  interceptors.responseError
 );
 
 module.exports = instance;
