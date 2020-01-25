@@ -10,7 +10,11 @@ then run: ```npm i --save git+ssh://git@git.pandemic-legion.pl:Floppy/node-esi.g
 NodeESI also uses redis as a caching layer, you will need redis-server installed before you can use NodeESI  
 You can install redis-server by running: ```sudo apt install redis-server```
 
-There is no way to change redis connection settings right now but will be implemented in the future.
+You can disable the caching layer by having `DISABLE_ESI_CACHE` set to true in your enviroment variables  
+
+```BASH
+DISABLE_ESI_CACHE=true node script.js
+````
 
 #### Getting Started
 
@@ -36,17 +40,28 @@ console.log(type_ids.data);
 
 //Authed requests
 const token = await Token.query().limit(1).first();
-const assets = await Esi.get(`/characters/${token.character_id}/assets`, { token: token })
-console.log(assets.data)
+const assets = await Esi.get(`/characters/${token.character_id}/assets`, { token: token });
+console.log(assets.data);
 
 //Auth and versioned request
 const fleet = await Esi.get(`/characters/${token.character_id}/fleet`, { 
     token, //short for token: token
     version: 'dev'
 });
-console.log(fleet.data)
+console.log(fleet.data);
 
 ```
+
+#### Concurrency Manager
+
+A concurrency manager is attached to the Axios instance and is defaulted to 10 concurrent requests, this can be disabled with
+
+```javascript
+const { Manager } = require('node-esi');
+Manager.detach();
+```
+
+You can also set `ESI_CONCURRENCY` in your env to increase or decrease concurrent requests
 
 #### DB Structure
 
