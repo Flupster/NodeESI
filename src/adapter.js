@@ -31,7 +31,7 @@ async function makeRequest(config) {
   } catch (ex) {
     //If the error is a 502, then CCP's API isn't doing well
     //We combat this by retrying it up to 3 times
-    if (ex.response.status === 502) {
+    if (ex.response && ex.response.status === 502) {
       config.retries = config.retries ? config.retries++ : 1;
       if (config.retries > 3) throw ex;
       else return makeRequest(config);
