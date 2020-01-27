@@ -4,8 +4,8 @@
   "description": "Node ESI Client with Auth",
   "url": "https://git.pandemic-legion.pl/Floppy/node-esi",
   "repository": {
-    "type" : "git",
-    "url" : "https://git.pandemic-legion.pl/Floppy/node-esi.git"
+    "type": "git",
+    "url": "https://git.pandemic-legion.pl/Floppy/node-esi.git"
   },
   "main": "src/index.js",
   "scripts": {},
