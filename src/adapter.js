@@ -11,20 +11,33 @@ module.exports = async config => {
 
   if (cache.exists) {
     cache.response.cached = true;
-    cache.response.config = config
+    cache.response.config = config;
     return cache.response;
   }
 
   config.adapter = axios.default.adapter;
-  const request = await axios(config);
-
-  if (request.headers.expires) {
-    cache.cacheResponse(request);
+  const response = await makeRequest(config);
+  if (response.headers.expires) {
+    cache.cacheResponse(response);
   }
 
-  request.cached = false;
-  return request;
+  response.cached = false;
+  return response;
 };
+
+async function makeRequest(config) {
+  try {
+    return await axios(config);
+  } catch (ex) {
+    //If the error is a 502, then CCP's API isn't doing well
+    //We combat this by retrying it up to 3 times
+    if (ex.response.status === 502) {
+      config.retries = config.retries ? config.retries++ : 1;
+      if (config.retries > 3) throw ex;
+      else return makeRequest(config);
+    } else throw ex;
+  }
+}
 
 class Cache {
   constructor(config) {
