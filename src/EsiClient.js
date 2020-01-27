@@ -6,7 +6,7 @@ const adapter = process.env.DISABLE_ESI_CACHE === 'true' ? axios.default.adapter
 
 const instance = axios.create({
   baseURL: "https://esi.evetech.net/",
-  timeout: 10000,
+  timeout: 11000,
   httpsAgent,
   adapter
 });
