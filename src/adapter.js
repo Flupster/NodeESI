@@ -5,7 +5,7 @@ const axios = require("axios");
 const Redis = require("ioredis");
 const redis = new Redis();
 
-module.exports = async config => {
+async function CacheAdapter(config) {
   const cache = new Cache(config);
   await cache.check();
 
@@ -23,7 +23,12 @@ module.exports = async config => {
 
   response.cached = false;
   return response;
-};
+}
+
+async function EsiAdapter(config) {
+  config.adapter = axios.default.adapter;
+  return await makeRequest(config);
+}
 
 async function makeRequest(config) {
   try {
@@ -77,3 +82,8 @@ class Cache {
     return await redis.setex(this.hash, expires / 1000 + 1, data);
   }
 }
+
+module.exports = {
+  CacheAdapter,
+  EsiAdapter
+};
