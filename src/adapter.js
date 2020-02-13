@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const axios = require("axios");
+const sleep = require("util").promisify(setTimeout);
 
 //TODO: allow redis connection to be configured other than default.
 const Redis = require("ioredis");
@@ -34,13 +35,40 @@ async function makeRequest(config) {
   try {
     return await axios(config);
   } catch (ex) {
-    //If the error is a 502, then CCP's API isn't doing well
-    //We combat this by retrying it up to 3 times
-    if (ex.response && [502, 504].includes(ex.response.status)) {
+    /*
+     * If no response throw the exception
+     */
+
+    if (!ex.response) throw ex;
+
+    /*
+     * If the error is a 502, then CCP's API isn't doing well
+     * We combat this by retrying it up to 3 times
+     */
+
+    if ([502, 504].includes(ex.response.status)) {
       config.retries = config.retries ? config.retries + 1 : 1;
       if (config.retries > 3) throw ex;
       else return makeRequest(config);
-    } else throw ex;
+    }
+
+    /*
+     * If the ratelimit is less than 10 remaining requests
+     * sleep until the ratelimit is reset then throw the exception
+     */
+
+    if (ex.response.headers["x-esi-error-limit-remain"] < 10) {
+      const reset = ex.response.headers["x-esi-error-limit-reset"];
+      console.warn(`NodeESI: Ratelimit has been reached, sleeping for ${reset}s`);
+      await sleep(reset * 1000);
+      throw ex;
+    }
+
+    /*
+     * finally throw the exception
+     */
+
+    throw ex;
   }
 }
 
