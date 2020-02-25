@@ -1,7 +1,7 @@
 {
   "name": "node-esi",
-  "version": "0.1.3",
-  "description": "Node ESI Client with Auth",
+  "version": "1.0.0",
+  "description": "Node ESI Client",
   "url": "https://git.pandemic-legion.pl/Floppy/node-esi",
   "repository": {
     "type": "git",

@@ -1,10 +1,7 @@
+const instance = require("./index");
 const crypto = require("crypto");
 const axios = require("axios");
 const sleep = require("util").promisify(setTimeout);
-
-//TODO: allow redis connection to be configured other than default.
-const Redis = require("ioredis");
-const redis = new Redis();
 
 async function CacheAdapter(config) {
   const cache = new Cache(config);
@@ -79,7 +76,7 @@ class Cache {
   }
 
   async check() {
-    this.cache = await redis.get(this.hash);
+    this.cache = await this.config.redis.get(this.hash);
     this.exists = Boolean(this.cache);
     this.response = JSON.parse(this.cache);
   }
@@ -107,7 +104,7 @@ class Cache {
       url: request.url
     });
 
-    return await redis.setex(this.hash, expires / 1000 + 1, data);
+    return await this.config.redis.setex(this.hash, expires / 1000 + 1, data);
   }
 }
 

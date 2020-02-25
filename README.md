@@ -1,96 +1,93 @@
-# PL NodeESI
+# Node ESI
 
-This project is an axios wrapper for ESI using the Pandemic Legion DB Structure
+Node ESI is a wrapper for the common http library [Axios](https://github.com/axios/axios) reading the docs for Axios will give you an idea of how Node ESI works
 
-### Install
+### Usage
 
-Make sure you have a pubkey into PL gitlab and configure ssh ~/.ssh/config with the port to 1420  
-then run: ```npm i --save git+ssh://git@git.pandemic-legion.pl:Floppy/node-esi.git```
+```JAVASCRIPT
+const Esi = require('node-esi');
+Esi('alliances').then(console.log).catch(console.error);
+```
 
-NodeESI also uses redis as a caching layer, you will need redis-server installed before you can use NodeESI  
-You can install redis-server by running: ```sudo apt install redis-server```
+### Cache
 
-You can disable the caching layer by having `DISABLE_ESI_CACHE` set to true in your enviroment variables  
+You can enable a redis cache by simply passing a redis uri to the cache function, afterwards all requests that can be cached locally will be
 
-```BASH
-DISABLE_ESI_CACHE=true node script.js
-````
+```JAVASCRIPT
+Esi.cache('redis://127.0.0.1');
+```
 
-#### Getting Started
+### Concurrency Manager
 
-Most of the docs from Axios are relevant as this just attaches some custom interceptors from the [official axios project](https://github.com/axios/axios)
+There is a concurrency manager loaded at start, you can detach the concurrency manager with
 
+```JAVASCRIPT
+// Detaches the concurrency manager
+Esi.manager.detach();
+```
 
-#### Usage
+You can also set a new concurrency manager by doing:
 
-Axios is promised based, so you can either use `.then()` or `await` but for examples I'll be using await
+```JAVASCRIPT
+// Set Concurrency to 5 requests at the same time
+Esi.manager.detach();
+Esi.manager = ConcurrencyManager(Esi, 5);
+```
 
-```javascript
-const { Esi, Token, KnexBind } = require('node-esi')
+### SSO Auth
 
-//You need to bind a knex instance to NodeESI in order to talk with a DB
-//check https://github.com/knex/knex for more info
+Node ESI uses [Objection](https://github.com/Vincit/objection.js/) ORM for managing tokens, the default model located at src/Token.js but you can supply your own Objection model, for more information please read the docs for the Token object at src/Token.js
 
-const knex = require("knex")(require("./knexfile")[process.env.NODE_ENV]);
-KnexBind(knex);
+Knex is an important part of authentication which manages the DB connection, you need to bind knex to the client before making any database calls
 
-//Non authed requests
-const type_ids = await Esi.get('/universe/types');
-console.log(type_ids.data);
+This can be fully managed in your own Token.js logic or via Node ESI
 
-//Authed requests
-const token = await Token.query().limit(1).first();
-const assets = await Esi.get(`/characters/${token.character_id}/assets`, { token: token });
-console.log(assets.data);
-
-//Auth and versioned request
-const fleet = await Esi.get(`/characters/${token.character_id}/fleet`, { 
-    token, //short for token: token
-    version: 'dev'
+```JAVASCRIPT
+const Esi = require("node-esi");
+const Token = require("path_to_custom_objection_model"); //Custom
+const Knex = require("knex");
+const db = Knex({
+    client: "mysql",
+    useNullAsDefault: true,
+    connection: {
+      host: "127.0.0.1",
+      user: "user_name",
+      password: "password",
+      database: "database_name",
+      charset: "utf8mb4",
+      supportBigNumbers: true,
+      bigNumberStrings: true
+    },
+    pool: { min: 1, max: 5 }
 });
-console.log(fleet.data);
 
+Esi.knex(db);
+Esi.defaults.model = Token;
 ```
 
-#### Concurrency Manager
+### Examples
 
-A concurrency manager is attached to the Axios instance and is defaulted to 10 concurrent requests, this can be disabled with
+```JAVASCRIPT
+const Esi = require("node-esi");
+const Token = require("node-esi/Token");
+const Knex = require("knex"); 
 
-```javascript
-const { Manager } = require('node-esi');
-Manager.detach();
+Esi.knex(Knex({})) //knex config...
+
+(async () => {
+    //Load a token with Objection
+    const token = await Token.query().where({character_name: 'Falopadous'});
+
+    //Non Authed Request
+    const alliances = await Esi('alliances');
+
+    //Authed request
+    const assets = await Esi(`characters/${token.character_id}/assets`, { token });
+    
+    //Versioning
+    const fleet = await Esi(`characters/${token.character_id}/fleet`, { 
+        version: 'dev',
+        token: token
+    });
+})();
 ```
-
-You can also set `ESI_CONCURRENCY` in your env to increase or decrease concurrent requests
-
-#### DB Structure
-
-The main EsiSeat project handles adding Eve SSO tokens and therefor uses the schemas from that project, NodeESI just mimics the PHP EsiClient package for refreshing tokens
-
-Here is the schema for the `tokens` table
-
-    CREATE TABLE IF NOT EXISTS `tokens` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
-    `character_id` bigint(20) NOT NULL,
-    `character_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `token_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `character_owner_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `access_token` text COLLATE utf8mb4_unicode_ci NOT NULL,
-    `refresh_token` text COLLATE utf8mb4_unicode_ci NOT NULL,
-    `expires` datetime NOT NULL,
-    `deleted_at` timestamp NULL DEFAULT NULL,
-    `created_at` timestamp NULL DEFAULT NULL,
-    `updated_at` timestamp NULL DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `tokens_user_id_index` (`user_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-#### Enviroment variables
-
-These enviroment variables are required if you are to use authed requests to the API
-
-    SSO_CLIENT_ID = The Eve SSO Client ID
-    SSO_SECRET  = The Eve SSO Secret
-    SSO_TOKEN_URI  = URI to fetch tokens usually https://login.eveonline.com/oauth/token
-    SSO_VERIFY_URI  = URI to verify usually https://login.eveonline.com/oauth/verify

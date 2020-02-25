@@ -1,20 +1,20 @@
+/*
+ * This is an example Objection model for managing tokens
+ *
+ * For this to work with NodeEsi you must have:
+ * - isExpired function: returns true if token needs to be refreshed
+ * - refresh function: return self after refreshing token
+ * - access_token property: returns the current access bearer token
+ * - character_id property: returns the character_id of the token
+ *
+ * If you have all of the above you can swap in another model to suit your schema
+ */
+
 const { Model } = require("objection");
-const TokenScope = require("./TokenScope");
 const axios = require("axios");
 
 class Token extends Model {
   static tableName = "tokens";
-
-  static relationMappings = {
-    scopes: {
-      relation: Model.HasManyRelation,
-      modelClass: TokenScope,
-      join: {
-        from: "tokens.id",
-        to: "token_scopes.token_id"
-      }
-    }
-  };
 
   isExpired() {
     return this.expires < new Date();
