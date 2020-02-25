@@ -4,7 +4,7 @@ Node ESI is a wrapper for the common http library [Axios](https://github.com/axi
 
 ### Usage
 
-```JS
+```javascript
 const Esi = require('node-esi');
 Esi('alliances').then(console.log).catch(console.error);
 ```
@@ -13,7 +13,7 @@ Esi('alliances').then(console.log).catch(console.error);
 
 You can enable a redis cache by simply passing a redis uri to the cache function, afterwards all requests that can be cached locally will be
 
-```JS
+```javascript
 Esi.cache('redis://127.0.0.1');
 ```
 
@@ -21,14 +21,14 @@ Esi.cache('redis://127.0.0.1');
 
 There is a concurrency manager loaded at start, you can detach the concurrency manager with
 
-```JS
+```javascript
 // Detaches the concurrency manager
 Esi.manager.detach();
 ```
 
 You can also set a new concurrency manager by doing:
 
-```JS
+```javascript
 // Set Concurrency to 5 requests at the same time
 Esi.manager.detach();
 Esi.manager = ConcurrencyManager(Esi, 5);
@@ -42,7 +42,7 @@ Knex is an important part of authentication which manages the DB connection, you
 
 This can be fully managed in your own Token.js logic or via Node ESI
 
-```JS
+```javascript
 const Esi = require("node-esi");
 const Token = require("path_to_custom_objection_model"); //Custom
 const Knex = require("knex");
@@ -67,7 +67,7 @@ Esi.defaults.model = Token;
 
 ### Examples
 
-```JS
+```javascript
 const Esi = require("node-esi");
 const Token = require("node-esi/Token");
 const Knex = require("knex"); 
