@@ -76,7 +76,7 @@ Esi.knex(Knex({})) //knex config...
 
 (async () => {
     //Load a token with Objection
-    const token = await Token.query().where({character_name: 'Falopadous'});
+    const token = await Token.query().where({character_name: 'Falopadous'}).first();
 
     //Non Authed Request
     const alliances = await Esi('alliances');
