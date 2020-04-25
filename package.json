@@ -1,15 +1,15 @@
 {
   "name": "node-esi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node ESI Client",
-  "url": "https://git.pandemic-legion.pl/Floppy/node-esi",
+  "url": "https://github.com/Flupster/NodeESI",
   "repository": {
     "type": "git",
-    "url": "https://git.pandemic-legion.pl/Floppy/node-esi.git"
+    "url": "https://github.com/Flupster/NodeESI.git"
   },
   "main": "src/index.js",
   "scripts": {},
-  "author": "Floppy",
+  "author": "Flupster",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.1",
