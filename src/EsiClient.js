@@ -19,6 +19,23 @@ instance.defaults.headers.common["User-Agent"] =
   process.env.AXIOS_USER_AGENT ||
   `NodeESI v${package.version} - ${package.url}`;
 
+//Helper function for getting all pages of a request
+instance.getPages = r => {
+  const pages = parseInt(r.headers["x-pages"]) + 1;
+  const range = [...Array(pages).keys()].slice(1);
+
+  const requests = range.map(page =>
+    instance({
+      method: r.config.method,
+      url: r.config.url.split("/").slice(4).join("/"),
+      model: r.config.model,
+      params: { ...r.config.params, page },
+    })
+  );
+
+  return Promise.all(requests);
+};
+
 //Setup Interceptors
 instance.interceptors.request.use(
   interceptors.request,
