@@ -12,7 +12,7 @@
   "author": "Flupster",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "axios-concurrency": "^1.0.3",
     "dotenv": "^8.2.0",
     "https": "^1.0.0",
